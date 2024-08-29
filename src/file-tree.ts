@@ -87,26 +87,5 @@ export class FileTreeDataProvider
   }
 }
 
-// export function activate(context: vscode.ExtensionContext) {
-//     // Example list of file paths; replace this with your own list
-//     const filePaths = [
-//         '/path/to/your/file1.txt',
-//         '/path/to/your/file2.txt',
-//         '/path/to/your/file3.html'
-//     ];
-
-//     const fileTreeDataProvider = new FileTreeDataProvider(filePaths);
-
-//     vscode.window.createTreeView('myCustomExplorer', {
-//         treeDataProvider: fileTreeDataProvider
-//     });
-
-//     // Example command to refresh the view
-//     const refreshCommand = vscode.commands.registerCommand('extension.refreshView', () => {
-//         fileTreeDataProvider.refresh();
-//     });
-
-//     context.subscriptions.push(refreshCommand);
-// }
 
 export function deactivate() {}

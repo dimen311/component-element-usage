@@ -10,7 +10,7 @@
     "Other"
   ],
   "activationEvents": [
-     "onView:myCustomExplorer"
+     
   ],
   "main": "./dist/extension.js",
   

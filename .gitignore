@@ -1,0 +1,27 @@
+# Node.js dependencies
+node_modules/
+
+# Build output
+out/
+
+# Log files
+*.log
+
+# Windows files
+Thumbs.db
+
+# VS Code workspace settings
+.vscode/
+
+# VS Code test results
+coverage/
+
+# Yarn
+.yarn/
+yarn-error.log
+
+# npm
+npm-debug.log
+*.tsbuildinfo
+
+# Environment variables
