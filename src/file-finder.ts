@@ -2,6 +2,8 @@ import * as path from "path";
 import * as vscode from "vscode";
 //@ts-ignore
 import { glob, globSync, globStream, globStreamSync, Glob } from "glob";
+import { FoundFile } from "./types";
+import { Helper } from "./helper";
 
 export class FileFinder {
   roothPath: string;
@@ -22,26 +24,36 @@ export class FileFinder {
     return await this.findFiles();
   }
 
-  private async findFiles(): Promise<string[]> {
+  private async findFiles(): Promise<FoundFile[]> {
     const files = await glob(this.searchPatern, {
       cwd: this.roothPath,
       ignore: "node_modules/**",
     });
 
-    const filteredFiles: any[] = [];
+    const filteredFiles: FoundFile[] = [];
     for (const file of files) {
       const filePath = path.join(this.roothPath || "", file);
       const contentStr = await this.getFileContent(filePath);
       if (contentStr.includes(this.searchedSelector)) {
-          const lines = contentStr.split("\n");
-        const startIndex = lines.findIndex(line => line.includes(this.searchedSelector));
-        const foundLine = lines[startIndex];
-        filteredFiles.push({path: filePath, content: foundLine, lineNumber: startIndex + 1});
+        const lines = contentStr.split("\n");
+        const allIndexes = this.findIndexAll1(lines, this.searchedSelector)
+        const foundLines = allIndexes.map(index => lines[index]);
+        const foundFile: FoundFile = { path: filePath, lines: foundLines, lineNumber: allIndexes };
+        filteredFiles.push(foundFile);
       }
     }
     return filteredFiles;
-       
+
   }
+
+  findIndexAll1(arr: string[], val: string) {
+
+    var indexes = [], i;
+    for (i = 0; i < arr.length; i++)
+        if (arr[i] === val)
+            indexes.push(i);
+    return indexes;
+}
 
   private async getFileContent(filePath: string): Promise<string> {
     const content = await vscode.workspace.fs.readFile(

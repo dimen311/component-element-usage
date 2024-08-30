@@ -1,5 +1,6 @@
 import * as vscode from "vscode";
 import * as path from "path";
+import { FoundFile } from "./types";
 
 // Define a TreeItem for files
 class FileTreeItem extends vscode.TreeItem {
@@ -46,7 +47,7 @@ export class FileTreeDataProvider
   readonly onDidChangeTreeData: vscode.Event<FileTreeItem | undefined> =
     this._onDidChangeTreeData.event;
 
-  constructor(private files: any[]) {}
+  constructor(private files: FoundFile[]) {}
 
   getTreeItem(element: FileTreeItem): vscode.TreeItem {
     return element;
@@ -58,15 +59,22 @@ export class FileTreeDataProvider
       // return Promise.resolve(
       return this.files.map((file) => {
         const fileName = path.basename(file.path);
-        if (file.content) {
+        if (file.lines?.length) {
+          const children = [];
+        for (let index = 0; index < file.lines.length; index++) {
+          const line = file.lines[index];
+          const lineNumber = file.lineNumber[index];
           const child = new FileTreeItem(
             file.path,
-            file.content,
-            file.lineNumber,
+            line,
+            lineNumber,
             undefined
           );
+          children.push(child);
+        }
+         
 
-          const itms = new FileTreeItem(file.path, fileName, null, [child]);
+          const itms = new FileTreeItem(file.path, fileName, null, children);
           return itms;
         } else {
           return new FileTreeItem(file.path, fileName, null, undefined);
