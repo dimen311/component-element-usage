@@ -8,6 +8,7 @@ import { Helper } from "./helper";
 export class FileFinder {
   roothPath: string;
   filePath: string;
+     //@ts-ignore
   searchedSelector: string;
   searchPatern: string;
   constructor(filePath: string, roothPath: string, searchPatern: string) {
@@ -25,18 +26,21 @@ export class FileFinder {
   }
 
   private async findFiles(): Promise<FoundFile[]> {
-    const files = await glob(this.searchPatern, {
+   
+    const files = await glob(this.searchPatern, { 
+      //@ts-ignore
       cwd: this.roothPath,
       ignore: "node_modules/**",
     });
 
     const filteredFiles: FoundFile[] = [];
+       //@ts-ignore
     for (const file of files) {
       const filePath = path.join(this.roothPath || "", file);
       const contentStr = await this.getFileContent(filePath);
       if (contentStr.includes(this.searchedSelector)) {
         const lines = contentStr.split("\n");
-        const allIndexes = this.findIndexAll1(lines, this.searchedSelector)
+        const allIndexes = Helper.findIndexAll(lines, this.searchedSelector);
         const foundLines = allIndexes.map(index => lines[index]);
         const foundFile: FoundFile = { path: filePath, lines: foundLines, lineNumber: allIndexes };
         filteredFiles.push(foundFile);
@@ -45,15 +49,6 @@ export class FileFinder {
     return filteredFiles;
 
   }
-
-  findIndexAll1(arr: string[], val: string) {
-
-    var indexes = [], i;
-    for (i = 0; i < arr.length; i++)
-        if (arr[i] === val)
-            indexes.push(i);
-    return indexes;
-}
 
   private async getFileContent(filePath: string): Promise<string> {
     const content = await vscode.workspace.fs.readFile(

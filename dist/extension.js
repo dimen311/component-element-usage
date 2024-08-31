@@ -6624,10 +6624,29 @@ var glob = Object.assign(glob_, {
 });
 glob.glob = glob;
 
+// src/helper.ts
+var Helper = class {
+  constructor() {
+  }
+  static findIndexAll(arr, val) {
+    var indexes = [], i;
+    for (i = 0; i < arr.length; i++)
+      if (arr[i].indexOf(val) > -1)
+        indexes.push(i);
+    return indexes;
+  }
+  // Example usage:
+  //   const text = "Hello world, hello everyone. Hello world!";
+  //   const substring = "Hello";
+  //   const allIndexes = findIndexAll(text, substring);
+  //   console.log(allIndexes); // Output: [0, 21]
+};
+
 // src/file-finder.ts
 var FileFinder = class {
   roothPath;
   filePath;
+  //@ts-ignore
   searchedSelector;
   searchPatern;
   constructor(filePath, roothPath, searchPatern) {
@@ -6642,6 +6661,7 @@ var FileFinder = class {
   }
   async findFiles() {
     const files = await glob(this.searchPatern, {
+      //@ts-ignore
       cwd: this.roothPath,
       ignore: "node_modules/**"
     });
@@ -6651,9 +6671,10 @@ var FileFinder = class {
       const contentStr = await this.getFileContent(filePath);
       if (contentStr.includes(this.searchedSelector)) {
         const lines = contentStr.split("\n");
-        const startIndex = lines.findIndex((line) => line.includes(this.searchedSelector));
-        const foundLine = lines[startIndex];
-        filteredFiles.push({ path: filePath, content: foundLine, lineNumber: startIndex + 1 });
+        const allIndexes = Helper.findIndexAll(lines, this.searchedSelector);
+        const foundLines = allIndexes.map((index) => lines[index]);
+        const foundFile = { path: filePath, lines: foundLines, lineNumber: allIndexes };
+        filteredFiles.push(foundFile);
       }
     }
     return filteredFiles;
@@ -6718,14 +6739,20 @@ var FileTreeDataProvider = class {
     if (!element) {
       return this.files.map((file) => {
         const fileName = path3.basename(file.path);
-        if (file.content) {
-          const child = new FileTreeItem(
-            file.path,
-            file.content,
-            file.lineNumber,
-            void 0
-          );
-          const itms = new FileTreeItem(file.path, fileName, null, [child]);
+        if (file.lines?.length) {
+          const children = [];
+          for (let index = 0; index < file.lines.length; index++) {
+            const line = file.lines[index];
+            const lineNumber = file.lineNumber[index];
+            const child = new FileTreeItem(
+              file.path,
+              line,
+              lineNumber,
+              void 0
+            );
+            children.push(child);
+          }
+          const itms = new FileTreeItem(file.path, fileName, null, children);
           return itms;
         } else {
           return new FileTreeItem(file.path, fileName, null, void 0);
