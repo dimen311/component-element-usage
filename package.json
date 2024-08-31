@@ -19,7 +19,7 @@
       "editor/context": [
         {
           "command": "usingcmpnnt.findComponentUsage",
-          "group": "usingcmpnnt",
+          "group": "0_navigation@3",
           "when": "editorLangId == 'typescript'"
         }
       ]
@@ -27,14 +27,14 @@
     "commands": [
       {
         "command": "usingcmpnnt.findComponentUsage",
-        "title": "Find Component Usage"
+        "title": "Find All Elements Usage"
       } 
     ],
     "views": {
       "explorer": [
         {
-          "id": "myCustomExplorer",
-          "name": "My Custom Files"
+          "id": "elementUsageExplorer",
+          "name": "Element usage explorer"
         }
       ]
     }

@@ -6635,11 +6635,6 @@ var Helper = class {
         indexes.push(i);
     return indexes;
   }
-  // Example usage:
-  //   const text = "Hello world, hello everyone. Hello world!";
-  //   const substring = "Hello";
-  //   const allIndexes = findIndexAll(text, substring);
-  //   console.log(allIndexes); // Output: [0, 21]
 };
 
 // src/file-finder.ts
@@ -6787,7 +6782,7 @@ function activate(context) {
       const foundedFiles = await fileFinder.init();
       if (foundedFiles.length > 0) {
         vscode3.window.registerTreeDataProvider(
-          "myCustomExplorer",
+          "elementUsageExplorer",
           new FileTreeDataProvider(foundedFiles)
         );
       }

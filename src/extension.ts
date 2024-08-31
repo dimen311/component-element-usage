@@ -26,7 +26,7 @@ export function activate(context: vscode.ExtensionContext) {
 
       if (foundedFiles.length > 0) {
         vscode.window.registerTreeDataProvider(
-          "myCustomExplorer",
+          "elementUsageExplorer",
           new FileTreeDataProvider(foundedFiles)
         );
       }
