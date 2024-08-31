@@ -1,6 +1,6 @@
 {
-  "name": "usingcmpnnt",
-  "displayName": "usingCmpnnt",
+  "name": "component_element_usage",
+  "displayName": "component_element_usage",
   "description": "",
   "version": "0.0.1",
   "engines": {
@@ -18,7 +18,7 @@
     "menus": {
       "editor/context": [
         {
-          "command": "usingcmpnnt.findComponentUsage",
+          "command": "component_element_usage.findComponentUsage",
           "group": "0_navigation@3",
           "when": "editorLangId == 'typescript'"
         }
@@ -26,7 +26,7 @@
     },
     "commands": [
       {
-        "command": "usingcmpnnt.findComponentUsage",
+        "command": "component_element_usage.findComponentUsage",
         "title": "Find All Elements Usage"
       } 
     ],

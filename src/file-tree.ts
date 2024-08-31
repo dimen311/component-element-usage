@@ -17,7 +17,7 @@ class FileTreeItem extends vscode.TreeItem {
         : vscode.TreeItemCollapsibleState.Expanded
     );
     this.tooltip = `${this.label} (${this.filePath})`;
-    this.description = this.filePath;
+    this.description = children === undefined ? `` : `${this.filePath}`;
 
     this.children = children;
     if (children) {
@@ -40,14 +40,13 @@ class FileTreeItem extends vscode.TreeItem {
 
 // Create a TreeDataProvider to provide the file tree structure
 export class FileTreeDataProvider
-  implements vscode.TreeDataProvider<FileTreeItem>
-{
+  implements vscode.TreeDataProvider<FileTreeItem> {
   private _onDidChangeTreeData: vscode.EventEmitter<FileTreeItem | undefined> =
     new vscode.EventEmitter<FileTreeItem | undefined>();
   readonly onDidChangeTreeData: vscode.Event<FileTreeItem | undefined> =
     this._onDidChangeTreeData.event;
 
-  constructor(private files: FoundFile[]) {}
+  constructor(private files: FoundFile[]) { }
 
   getTreeItem(element: FileTreeItem): vscode.TreeItem {
     return element;
@@ -61,18 +60,18 @@ export class FileTreeDataProvider
         const fileName = path.basename(file.path);
         if (file.lines?.length) {
           const children = [];
-        for (let index = 0; index < file.lines.length; index++) {
-          const line = file.lines[index];
-          const lineNumber = file.lineNumber[index];
-          const child = new FileTreeItem(
-            file.path,
-            line,
-            lineNumber,
-            undefined
-          );
-          children.push(child);
-        }
-         
+          for (let index = 0; index < file.lines.length; index++) {
+            const line = file.lines[index];
+            const lineNumber = file.lineNumber[index];
+            const child = new FileTreeItem(
+              file.path,
+              line,
+              lineNumber,
+              undefined
+            );
+            children.push(child);
+          }
+
 
           const itms = new FileTreeItem(file.path, fileName, null, children);
           return itms;
@@ -96,4 +95,4 @@ export class FileTreeDataProvider
 }
 
 
-export function deactivate() {}
+export function deactivate() { }

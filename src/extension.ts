@@ -5,7 +5,7 @@ import { FileTreeDataProvider } from "./file-tree";
 
 export function activate(context: vscode.ExtensionContext) {
   let disposable = vscode.commands.registerCommand(
-    "usingcmpnnt.findComponentUsage",
+    "component_element_usage.findComponentUsage",
     async () => {
       const editor = vscode.window.activeTextEditor;
 

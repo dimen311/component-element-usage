@@ -1,6 +1,6 @@
-# usingcmpnnt README
+# component_element_usage README
 
-This is the README for your extension "usingcmpnnt". After writing up a brief description, we recommend including the following sections.
+This is the README for your extension "component_element_usage". After writing up a brief description, we recommend including the following sections.
 
 ## Features
 

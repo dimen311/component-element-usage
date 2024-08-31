@@ -6703,7 +6703,7 @@ var FileTreeItem = class extends vscode2.TreeItem {
     this.lineNumber = lineNumber;
     this.children = children;
     this.tooltip = `${this.label} (${this.filePath})`;
-    this.description = this.filePath;
+    this.description = children === void 0 ? `` : `${this.filePath}`;
     this.children = children;
     if (children) {
       this.command = {
@@ -6765,7 +6765,7 @@ var FileTreeDataProvider = class {
 // src/extension.ts
 function activate(context) {
   let disposable = vscode3.commands.registerCommand(
-    "usingcmpnnt.findComponentUsage",
+    "component_element_usage.findComponentUsage",
     async () => {
       const editor = vscode3.window.activeTextEditor;
       if (!editor) {
