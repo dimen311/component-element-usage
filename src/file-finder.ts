@@ -1,22 +1,19 @@
+import { glob } from "glob";
 import * as path from "path";
 import * as vscode from "vscode";
-//@ts-ignore
-import { glob, globSync, globStream, globStreamSync, Glob } from "glob";
-import { FoundFile } from "./types";
 import { Helper } from "./helper";
+import { FoundFile } from "./types";
 
 export class FileFinder {
   roothPath: string;
   filePath: string;
-     //@ts-ignore
   searchedSelector: string;
   searchPatern: string;
   constructor(filePath: string, roothPath: string, searchPatern: string) {
     this.filePath = filePath;
-    //const searchPattern = `**/${componentName}`;
     this.roothPath = roothPath;
-    //this.componentName = componentName;
     this.searchPatern = searchPatern;
+    this.searchedSelector = '';
   }
 
   public async init() {
@@ -26,15 +23,13 @@ export class FileFinder {
   }
 
   private async findFiles(): Promise<FoundFile[]> {
-   
-    const files = await glob(this.searchPatern, { 
-      //@ts-ignore
+
+    const files = await glob(this.searchPatern, {
       cwd: this.roothPath,
       ignore: "node_modules/**",
     });
 
     const filteredFiles: FoundFile[] = [];
-       //@ts-ignore
     for (const file of files) {
       const filePath = path.join(this.roothPath || "", file);
       const contentStr = await this.getFileContent(filePath);
@@ -54,13 +49,12 @@ export class FileFinder {
     const content = await vscode.workspace.fs.readFile(
       vscode.Uri.file(filePath)
     );
-    return new Promise((resolve, reject) => {
+    return new Promise((resolve) => {
       resolve(Buffer.from(content).toString("utf8"));
     });
   }
 
   extractComponenSelector(fileContent: string): string {
-    // 
     const regex = /@Component\(\s*{[^}]*?\bselector:\s*'([^']*)'/;
     const match = fileContent.match(regex);
     return match ? "<" + match[1] : "";

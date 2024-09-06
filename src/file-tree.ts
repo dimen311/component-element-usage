@@ -34,17 +34,11 @@ class FileTreeItem extends vscode.TreeItem {
       };
     }
   }
-
-  contextValue = "fileTreeItem";
 }
 
 // Create a TreeDataProvider to provide the file tree structure
 export class FileTreeDataProvider
   implements vscode.TreeDataProvider<FileTreeItem> {
-  private _onDidChangeTreeData: vscode.EventEmitter<FileTreeItem | undefined> =
-    new vscode.EventEmitter<FileTreeItem | undefined>();
-  readonly onDidChangeTreeData: vscode.Event<FileTreeItem | undefined> =
-    this._onDidChangeTreeData.event;
 
   constructor(private files: FoundFile[]) { }
 
@@ -55,7 +49,6 @@ export class FileTreeDataProvider
   getChildren(element?: FileTreeItem): FileTreeItem[] {
     // If no element is passed, return the root files
     if (!element) {
-      // return Promise.resolve(
       return this.files.map((file) => {
         const fileName = path.basename(file.path);
         if (file.lines?.length) {
@@ -72,26 +65,17 @@ export class FileTreeDataProvider
             children.push(child);
           }
 
-
-          const itms = new FileTreeItem(file.path, fileName, null, children);
-          return itms;
+          return new FileTreeItem(file.path, fileName, null, children);
         } else {
           return new FileTreeItem(file.path, fileName, null, undefined);
         }
       });
-      //  );
     } else {
-      // If an element is passed, return its children
       return element.children || [];
     }
-    //return Promise.resolve([]);
-    /// return [];
   }
 
-  refresh() {
-    //@ts-ignore
-    this._onDidChangeTreeData.fire();
-  }
+
 }
 
 

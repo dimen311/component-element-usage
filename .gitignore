@@ -2,6 +2,7 @@
 node_modules/
 
 # Build output
+dist/
 out/
 
 # Log files
@@ -12,6 +13,7 @@ Thumbs.db
 
 # VS Code workspace settings
 .vscode/
+.vscode-test/
 
 # VS Code test results
 coverage/
@@ -23,5 +25,7 @@ yarn-error.log
 # npm
 npm-debug.log
 *.tsbuildinfo
+
+**/*.js.map
 
 # Environment variables
