@@ -1,8 +1,9 @@
 {
-  "name": "component_element_usage",
-  "displayName": "component_element_usage",
+  "name": "angularComponentElementUsage",
+  "displayName": "angular_component_element_usage",
   "description": "",
   "version": "0.0.1",
+  "publisher": "Dimen",
   "engines": {
     "vscode": "^1.92.0"
   },
