@@ -35,13 +35,7 @@ export function activate(context: vscode.ExtensionContext) {
 
       setTimeout(() => {
         fileTreeDataProvider.showResults(foundedFiles);
-      }, 3000);
-      // if (foundedFiles.length > 0) {
-      //   vscode.window.registerTreeDataProvider(
-      //     "elementUsageExplorer",
-      //     new FileTreeDataProvider(foundedFiles)
-      //   );
-      // }
+      }, 100);
 
 
     }
