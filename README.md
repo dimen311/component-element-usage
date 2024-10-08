@@ -52,7 +52,7 @@ Alternatively, you can manually install the extension by downloading it from the
 
 ## Contributing
 
-Contributions are welcome! If you'd like to contribute, please fork the repository and submit a pull request. For any issues or suggestions, please open a ticket on the [GitHub Issues page](https://github.com/your-repo).
+Contributions are welcome! If you'd like to contribute, please fork the repository and submit a pull request. For any issues or suggestions, please open a ticket on the [GitHub Issues page](https://github.com/dimen311/component-element-usage).
 
 ## License
 
