@@ -14,7 +14,7 @@
 
 
   <br>
-    <img src="https://github.com/dimen311/shared_folder/blob/main/angularComponentElementUsage.gif?raw=true" alt="logo" width="100%">
+    <img src="https://raw.githubusercontent.com/dimen311/component-element-usage/refs/heads/master/angular_Component_finder.gif" alt="logo" width="100%">
   <br>
 
 ## Usage
