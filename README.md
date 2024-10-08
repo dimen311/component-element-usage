@@ -2,7 +2,28 @@
 
 ## Overview
 
-**Angular Component Usage Finder** is a Visual Studio Code extension that helps you quickly find the usage of Angular components within your project's HTML templates. Simply right-click on an Angular component and select "Find All Elements Usage" to locate where it's used across your project.
+<h1 align="center">
+
+ VS CODE - Angular Component Usage Finder
+
+  <br>
+  <br>
+</h1>
+
+**Angular Component Usage Finder** is a Visual Studio Code extension that helps you quickly find the usage of Angular components within your project's HTML templates. Simply right-click on an Angular component and select "Find Component Usages" to locate where it's used across your project.
+
+
+  <br>
+    <img src="https://github.com/dimen311/shared_folder/blob/main/angularComponentElementUsage.gif?raw=true" alt="logo" width="200">
+  <br>
+
+## Usage
+
+1. Open any Angular project in Visual Studio Code.
+2. In the HTML file, right-click on a component tag you wish to find.
+3. Select **Find Component Usages** from the context menu.
+4. The extension will search through your project’s HTML templates and display all occurrences of the component under explorer: Element usage explorer.
+
 
 ## Features
 
@@ -18,13 +39,6 @@
 4. Click **Install**.
 
 Alternatively, you can manually install the extension by downloading it from the [Visual Studio Code Marketplace](https://marketplace.visualstudio.com/).
-
-## Usage
-
-1. Open any Angular project in Visual Studio Code.
-2. In the HTML file, right-click on a component tag you wish to find.
-3. Select **Find All Elements Usage** from the context menu.
-4. The extension will search through your project’s HTML templates and display all occurrences of the component.
 
 ## Requirements
 

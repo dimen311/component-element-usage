@@ -1,9 +1,16 @@
 {
   "name": "angularComponentElementUsage",
-  "displayName": "angular_component_element_usage",
-  "description": "",
+  "displayName": "Angular component element usage in project",
+  "description": "quickly find the usage of Angular components within your project's HTML templates",
   "version": "0.0.1",
   "publisher": "ExtensionDmn",
+  "icon": "logo.png",
+  "categories": [
+    "Programming Languages"],
+  "keywords": [
+    "html",
+    "angular"
+  ],
   "repository": {
     "type": "git",
     "url": "https://github.com/dimen311/component-element-usage.git"
@@ -11,9 +18,6 @@
   "engines": {
     "vscode": "^1.92.0"
   },
-  "categories": [
-    "Other"
-  ],
   "activationEvents": [
      
   ],
@@ -32,7 +36,7 @@
     "commands": [
       {
         "command": "component_element_usage.findComponentUsage",
-        "title": "Find All Elements Usage"
+        "title": "Find Component Usages"
       } 
     ],
     "views": {

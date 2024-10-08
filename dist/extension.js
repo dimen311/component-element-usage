@@ -247,10 +247,6 @@ __export(extension_exports, {
 module.exports = __toCommonJS(extension_exports);
 var vscode3 = __toESM(require("vscode"));
 
-// src/file-finder.ts
-var path2 = __toESM(require("path"));
-var vscode = __toESM(require("vscode"));
-
 // node_modules/.pnpm/minimatch@10.0.1/node_modules/minimatch/dist/esm/index.js
 var import_brace_expansion = __toESM(require_brace_expansion(), 1);
 
@@ -1584,7 +1580,7 @@ minimatch.unescape = unescape;
 // node_modules/.pnpm/glob@11.0.0/node_modules/glob/dist/esm/glob.js
 var import_node_url2 = require("node:url");
 
-// node_modules/.pnpm/lru-cache@11.0.0/node_modules/lru-cache/dist/esm/index.js
+// node_modules/.pnpm/lru-cache@11.0.1/node_modules/lru-cache/dist/esm/index.js
 var perf = typeof performance === "object" && performance && typeof performance.now === "function" ? performance : Date;
 var warned = /* @__PURE__ */ new Set();
 var PROCESS = typeof process === "object" && !!process ? process : {};
@@ -6624,6 +6620,10 @@ var glob = Object.assign(glob_, {
 });
 glob.glob = glob;
 
+// src/file-finder.ts
+var path2 = __toESM(require("path"));
+var vscode = __toESM(require("vscode"));
+
 // src/helper.ts
 var Helper = class {
   constructor() {
@@ -6641,13 +6641,13 @@ var Helper = class {
 var FileFinder = class {
   roothPath;
   filePath;
-  //@ts-ignore
   searchedSelector;
   searchPatern;
   constructor(filePath, roothPath, searchPatern) {
     this.filePath = filePath;
     this.roothPath = roothPath;
     this.searchPatern = searchPatern;
+    this.searchedSelector = "";
   }
   async init() {
     const searchedFileContent = await this.getFileContent(this.filePath);
@@ -6656,7 +6656,6 @@ var FileFinder = class {
   }
   async findFiles() {
     const files = await glob(this.searchPatern, {
-      //@ts-ignore
       cwd: this.roothPath,
       ignore: "node_modules/**"
     });
@@ -6678,7 +6677,7 @@ var FileFinder = class {
     const content = await vscode.workspace.fs.readFile(
       vscode.Uri.file(filePath)
     );
-    return new Promise((resolve, reject) => {
+    return new Promise((resolve) => {
       resolve(Buffer.from(content).toString("utf8"));
     });
   }
@@ -6693,7 +6692,7 @@ var FileFinder = class {
 var vscode2 = __toESM(require("vscode"));
 var path3 = __toESM(require("path"));
 var FileTreeItem = class extends vscode2.TreeItem {
-  constructor(filePath, label, lineNumber, children) {
+  constructor(filePath, label, lineNumber, children, options) {
     super(
       label,
       children === void 0 ? vscode2.TreeItemCollapsibleState.None : vscode2.TreeItemCollapsibleState.Expanded
@@ -6702,6 +6701,10 @@ var FileTreeItem = class extends vscode2.TreeItem {
     this.label = label;
     this.lineNumber = lineNumber;
     this.children = children;
+    this.options = options;
+    if (options && options.iconPath) {
+      this.iconPath = options.iconPath;
+    }
     this.tooltip = `${this.label} (${this.filePath})`;
     this.description = children === void 0 ? `` : `${this.filePath}`;
     this.children = children;
@@ -6719,18 +6722,23 @@ var FileTreeItem = class extends vscode2.TreeItem {
       };
     }
   }
-  contextValue = "fileTreeItem";
 };
 var FileTreeDataProvider = class {
-  constructor(files) {
-    this.files = files;
-  }
   _onDidChangeTreeData = new vscode2.EventEmitter();
   onDidChangeTreeData = this._onDidChangeTreeData.event;
+  files = [];
+  isLoading = false;
+  constructor() {
+  }
   getTreeItem(element) {
     return element;
   }
   getChildren(element) {
+    if (this.isLoading) {
+      return [new FileTreeItem("", "Loading...", null, void 0, {
+        iconPath: new vscode2.ThemeIcon("loading~spin")
+      })];
+    }
     if (!element) {
       return this.files.map((file) => {
         const fileName = path3.basename(file.path);
@@ -6747,8 +6755,7 @@ var FileTreeDataProvider = class {
             );
             children.push(child);
           }
-          const itms = new FileTreeItem(file.path, fileName, null, children);
-          return itms;
+          return new FileTreeItem(file.path, fileName, null, children);
         } else {
           return new FileTreeItem(file.path, fileName, null, void 0);
         }
@@ -6759,6 +6766,17 @@ var FileTreeDataProvider = class {
   }
   refresh() {
     this._onDidChangeTreeData.fire();
+  }
+  // Call this method to show the loading indicator
+  showLoading() {
+    this.isLoading = true;
+    this.refresh();
+  }
+  // Call this method when search is complete
+  showResults(searchResults) {
+    this.isLoading = false;
+    this.files = searchResults;
+    this.refresh();
   }
 };
 
@@ -6774,18 +6792,21 @@ function activate(context) {
       }
       const filePath = editor.document.uri.fsPath;
       const searchPatern = `**/*.{html,htm}`;
+      const fileTreeDataProvider = new FileTreeDataProvider();
+      vscode3.window.registerTreeDataProvider(
+        "elementUsageExplorer",
+        fileTreeDataProvider
+      );
+      fileTreeDataProvider.showLoading();
       const fileFinder = new FileFinder(
         filePath,
         vscode3.workspace.rootPath || "",
         searchPatern
       );
       const foundedFiles = await fileFinder.init();
-      if (foundedFiles.length > 0) {
-        vscode3.window.registerTreeDataProvider(
-          "elementUsageExplorer",
-          new FileTreeDataProvider(foundedFiles)
-        );
-      }
+      setTimeout(() => {
+        fileTreeDataProvider.showResults(foundedFiles);
+      }, 3e3);
     }
   );
   context.subscriptions.push(disposable);

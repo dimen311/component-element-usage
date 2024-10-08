@@ -15,8 +15,17 @@ export function activate(context: vscode.ExtensionContext) {
       }
 
       const filePath = editor.document.uri.fsPath;
-     
+
       const searchPatern = `**/*.{html,htm}`;
+
+      const fileTreeDataProvider = new FileTreeDataProvider();
+      vscode.window.registerTreeDataProvider(
+        "elementUsageExplorer",
+        fileTreeDataProvider
+      );
+
+      fileTreeDataProvider.showLoading();
+
       const fileFinder = new FileFinder(
         filePath,
         vscode.workspace.rootPath || "",
@@ -24,35 +33,38 @@ export function activate(context: vscode.ExtensionContext) {
       );
       const foundedFiles = await fileFinder.init();
 
-      if (foundedFiles.length > 0) {
-        vscode.window.registerTreeDataProvider(
-          "elementUsageExplorer",
-          new FileTreeDataProvider(foundedFiles)
-        );
-      }
+      setTimeout(() => {
+        fileTreeDataProvider.showResults(foundedFiles);
+      }, 3000);
+      // if (foundedFiles.length > 0) {
+      //   vscode.window.registerTreeDataProvider(
+      //     "elementUsageExplorer",
+      //     new FileTreeDataProvider(foundedFiles)
+      //   );
+      // }
 
-      
+
     }
   );
   context.subscriptions.push(disposable);
 
   let openFileCommand = vscode.commands.registerCommand('extension.openFileAtLine', async (filePath, lineNumber) => {
-  
+
     await vscode.commands.executeCommand('vscode.open', filePath, {
-        viewColumn: vscode.ViewColumn.One,
-        preserveFocus: true,
-        preview: false
+      viewColumn: vscode.ViewColumn.One,
+      preserveFocus: true,
+      preview: false
     });
 
     const editor = vscode.window.activeTextEditor;
     if (editor) {
-        const position = new vscode.Position(lineNumber - 1, 0); // Line numbers are zero-based
-        const range = new vscode.Range(position, position);
-        editor.revealRange(range, vscode.TextEditorRevealType.InCenter);
+      const position = new vscode.Position(lineNumber - 1, 0); // Line numbers are zero-based
+      const range = new vscode.Range(position, position);
+      editor.revealRange(range, vscode.TextEditorRevealType.InCenter);
     }
-});
+  });
 
-context.subscriptions.push(openFileCommand);
+  context.subscriptions.push(openFileCommand);
 }
 
-export function deactivate() {}
+export function deactivate() { }
