@@ -1,7 +1,6 @@
 import * as vscode from "vscode";
 import { FileFinder } from "./file-finder";
-
-import { FileTreeDataProvider } from "./file-tree";
+import { FileTreeDataProvider } from "./file-tree-data-provider";
 
 export function activate(context: vscode.ExtensionContext) {
   let disposable = vscode.commands.registerCommand(

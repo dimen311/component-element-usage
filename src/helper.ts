@@ -4,11 +4,14 @@ export class Helper {
     }
 
     static findIndexAll(arr: string[], val: string) {
-
-        var indexes = [], i;
-        for (i = 0; i < arr.length; i++)
-            if (arr[i].indexOf(val) > -1)
+        let indexes = [];
+        const regex = new RegExp(`^${val}(\\s|>)`);
+    
+        for (let i = 0; i < arr.length; i++) {
+            if (regex.test(arr[i])) {
                 indexes.push(i);
+            }
+        }
         return indexes;
     }
 

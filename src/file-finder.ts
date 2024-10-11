@@ -1,6 +1,6 @@
 import { glob } from "glob";
 import * as path from "path";
-import * as vscode from "vscode";
+import vscode from "vscode";
 import { Helper } from "./helper";
 import { FoundFile } from "./types";
 
@@ -57,6 +57,6 @@ export class FileFinder {
   extractComponenSelector(fileContent: string): string {
     const regex = /@Component\(\s*{[^}]*?\bselector:\s*'([^']*)'/;
     const match = fileContent.match(regex);
-    return match ? "<" + match[1] : "";
+    return match ? ("<" + match[1]) : "";
   }
 }
