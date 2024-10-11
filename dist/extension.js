@@ -6630,9 +6630,9 @@ var Helper = class {
   }
   static findIndexAll(arr, val) {
     let indexes = [];
-    const regex = new RegExp(`^${val}(\\s|>)`);
+    const regex = new RegExp(`${val}(?:\\s+[^>]*)?(?:>|/>\\s*|$)`, "g");
     for (let i = 0; i < arr.length; i++) {
-      if (regex.test(arr[i])) {
+      if (arr[i].match(regex)) {
         indexes.push(i);
       }
     }

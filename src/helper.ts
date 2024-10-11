@@ -5,14 +5,12 @@ export class Helper {
 
     static findIndexAll(arr: string[], val: string) {
         let indexes = [];
-        const regex = new RegExp(`^${val}(\\s|>)`);
-    
+        const regex = new RegExp(`${val}(?:\\s+[^>]*)?(?:>|\/>\\s*|$)`,'g');    
         for (let i = 0; i < arr.length; i++) {
-            if (regex.test(arr[i])) {
-                indexes.push(i);
-            }
+           if( arr[i].match(regex)){
+            indexes.push(i);
+           }
         }
         return indexes;
     }
-
 }
