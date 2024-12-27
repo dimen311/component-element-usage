@@ -1,5 +1,12 @@
 # Welcome to your VS Code Extension
 
+## update version of extension
+
+vsce login ExtensionDmn
+vsce package
+vsce publish
+
+
 ## What's in the folder
 
 * This folder contains all of the files necessary for your extension.
