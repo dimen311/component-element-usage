@@ -1,6 +1,6 @@
-import vscode from "vscode";
- 
- 
+import vscode, { IconPath } from "vscode";
+
+
 export class FileTreeItem extends vscode.TreeItem {
   constructor(
     public readonly filePath: string,
@@ -8,7 +8,7 @@ export class FileTreeItem extends vscode.TreeItem {
     public readonly lineNumber: number | null,
     public readonly children: FileTreeItem[] | undefined,
     public readonly options?: {
-      iconPath?: string | vscode.Uri | { light: string | vscode.Uri; dark: string | vscode.Uri } | vscode.ThemeIcon;
+      iconPath: string | IconPath;
     }
   ) {
     super(
