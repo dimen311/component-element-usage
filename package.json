@@ -2,7 +2,7 @@
   "name": "angularComponentElementUsage",
   "displayName": "Angular component usage finder",
   "description": "quickly find the usage of Angular components within your project's HTML templates",
-  "version": "0.1.3",
+  "version": "0.2.0",
   "publisher": "ExtensionDmn",
   "icon": "logo.png",
   "categories": [
