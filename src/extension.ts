@@ -44,7 +44,7 @@ export function activate(context: vscode.ExtensionContext) {
 
 	context.subscriptions.push(fileWatcher);
 
-	let disposable = vscode.commands.registerCommand('component-element-usage.findUsages', async () => {
+	let disposable = vscode.commands.registerCommand('component_element_usage.findComponentUsage', async () => {
 		const editor = vscode.window.activeTextEditor;
 		if (!editor) {
 			vscode.window.showInformationMessage('No active editor');

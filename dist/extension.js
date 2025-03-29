@@ -6630,24 +6630,35 @@ glob.glob = glob;
 
 // src/component-index.ts
 var fs = __toESM(require("fs"));
-var ComponentIndexManager = class {
+var ComponentIndexManager = class _ComponentIndexManager {
+  static INDEX_FILE = ".angular-component-index.json";
+  static IGNORE_PATTERNS = [
+    "node_modules/**",
+    "dist/**",
+    "out/**",
+    "e2e/**",
+    ".angular/**",
+    ".vscode/**",
+    "public/**",
+    "assets/**",
+    ".git/**",
+    "**/*.test.ts",
+    "**/*.spec.ts"
+  ];
+  indexPath;
+  rootPath;
+  storagePath;
+  index = {};
+  isIndexRunning = false;
   constructor(rootPath, context) {
     this.rootPath = rootPath;
-    this.context = context;
     this.storagePath = context.globalStorageUri.fsPath;
-    this.indexPath = path2.join(this.storagePath, ".angular-component-index.json");
+    this.indexPath = path2.join(this.storagePath, _ComponentIndexManager.INDEX_FILE);
     if (!fs.existsSync(this.storagePath)) {
       fs.mkdirSync(this.storagePath, { recursive: true });
     }
     this.loadIndex();
   }
-  static INDEX_FILE = ".angular-component-index.json";
-  indexPath;
-  index = {};
-  isIndexRunning = false;
-  // use Global Storage Path
-  useGlobalStoragePath = true;
-  storagePath;
   loadIndex() {
     try {
       if (fs.existsSync(this.indexPath)) {
@@ -6660,9 +6671,6 @@ var ComponentIndexManager = class {
   }
   saveIndex() {
     try {
-      if (!fs.existsSync(this.storagePath)) {
-        fs.mkdirSync(this.storagePath, { recursive: true });
-      }
       fs.writeFileSync(this.indexPath, JSON.stringify(this.index, null, 2));
     } catch (error) {
       console.error("Failed to save index:", error);
@@ -6671,29 +6679,8 @@ var ComponentIndexManager = class {
   normalizePath(filePath) {
     return filePath.replace(/\\/g, "/");
   }
-  async buildIndex() {
-    if (this.isIndexRunning) {
-      return;
-    }
-    this.isIndexRunning = true;
-    const componentFiles = await glob("**/*.{ts,html}", {
-      cwd: this.rootPath,
-      ignore: [
-        "node_modules/**",
-        "dist/**",
-        "out/**",
-        "e2e/**",
-        ".angular/**",
-        ".vscode/**",
-        "public/**",
-        "assets/**",
-        ".git/**",
-        "**/*.test.ts",
-        "**/*.spec.ts"
-      ]
-    });
-    this.index = {};
-    for (const file of componentFiles) {
+  async collectComponentSelectors(files) {
+    for (const file of files) {
       if (file.endsWith(".ts")) {
         const filePath = path2.join(this.rootPath, file);
         const content = await this.readFile(filePath);
@@ -6706,7 +6693,9 @@ var ComponentIndexManager = class {
         }
       }
     }
-    for (const file of componentFiles) {
+  }
+  async findComponentUsagesInFiles(files) {
+    for (const file of files) {
       if (file.endsWith(".html")) {
         const filePath = path2.join(this.rootPath, file);
         const content = await this.readFile(filePath);
@@ -6720,8 +6709,24 @@ var ComponentIndexManager = class {
         }
       }
     }
-    this.saveIndex();
-    this.isIndexRunning = false;
+  }
+  async buildIndex() {
+    if (this.isIndexRunning) {
+      return;
+    }
+    this.isIndexRunning = true;
+    try {
+      const componentFiles = await glob("**/*.{ts,html}", {
+        cwd: this.rootPath,
+        ignore: _ComponentIndexManager.IGNORE_PATTERNS
+      });
+      this.index = {};
+      await this.collectComponentSelectors(componentFiles);
+      await this.findComponentUsagesInFiles(componentFiles);
+      this.saveIndex();
+    } finally {
+      this.isIndexRunning = false;
+    }
   }
   async readFile(filePath) {
     const content = await vscode.workspace.fs.readFile(vscode.Uri.file(filePath));
@@ -6732,12 +6737,10 @@ var ComponentIndexManager = class {
     const match2 = content.match(regex);
     return match2 ? match2[1] : null;
   }
-  // extract component selector from template property
   extractComponentFromTemplate(content) {
     const regex = /@Component\s*\(\s*\{[^}]*template\s*:\s*['"`]([^'"`]*)['"`][^}]*\}\s*\)/;
     const match2 = content.match(regex);
-    const templateStr = match2 ? match2[1] : null;
-    return templateStr;
+    return match2 ? match2[1] : null;
   }
   updateTemplateUsages(file, content) {
     const lines = content.split("\n");
@@ -6749,11 +6752,9 @@ var ComponentIndexManager = class {
           lines2.add(index + 1);
         }
         if (lines2.size > 0) {
-          if (selectorNode.usages.some((u) => u.file === file)) {
-            const existingUsage = selectorNode.usages.find((u) => u.file === file);
-            if (existingUsage) {
-              existingUsage.lines = Array.from(/* @__PURE__ */ new Set([...existingUsage.lines, ...lines2]));
-            }
+          const existingUsage = selectorNode.usages.find((u) => u.file === file);
+          if (existingUsage) {
+            existingUsage.lines = Array.from(/* @__PURE__ */ new Set([...existingUsage.lines, ...lines2]));
           } else {
             selectorNode.usages.push({ file, lines: Array.from(lines2) });
           }
@@ -6930,7 +6931,7 @@ function activate(context) {
     rebuildTimeout = setTimeout(async () => {
       await indexManager.buildIndex();
       rebuildTimeout = void 0;
-    }, 1e3);
+    }, 1e4);
   };
   fileWatcher.onDidChange(() => {
     debouncedRebuild();
@@ -6942,7 +6943,7 @@ function activate(context) {
     debouncedRebuild();
   });
   context.subscriptions.push(fileWatcher);
-  let disposable = vscode5.commands.registerCommand("component-element-usage.findUsages", async () => {
+  let disposable = vscode5.commands.registerCommand("component_element_usage.findComponentUsage", async () => {
     const editor = vscode5.window.activeTextEditor;
     if (!editor) {
       vscode5.window.showInformationMessage("No active editor");
