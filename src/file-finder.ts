@@ -1,57 +1,64 @@
-import { glob } from "glob";
 import * as path from "path";
 import vscode from "vscode";
-import { Helper } from "./helper";
+import { ComponentIndexManager } from "./component-index";
 import { FoundFile } from "./types";
 
 export class FileFinder {
-  roothPath: string;
-  filePath: string;
-  searchedSelector: string;
-  searchPatern: string;
-  constructor(filePath: string, roothPath: string, searchPatern: string) {
+  private roothPath: string;
+  private filePath: string;
+
+  private searchedSelector: string;
+  private indexManager: ComponentIndexManager;
+
+  constructor(filePath: string, roothPath: string, context: vscode.ExtensionContext) {
     this.filePath = filePath;
     this.roothPath = roothPath;
-    this.searchPatern = searchPatern;
+
     this.searchedSelector = '';
+    this.indexManager = new ComponentIndexManager(roothPath, context);
   }
 
   public async init() {
     const searchedFileContent = await this.getFileContent(this.filePath);
     this.searchedSelector = this.extractComponenSelector(searchedFileContent);
+    
+    // Ensure index is built
+    await this.indexManager.buildIndex();
+    
     return await this.findFiles();
   }
 
   private async findFiles(): Promise<FoundFile[]> {
+    if (!this.searchedSelector) {
+      return [];
+    }
 
-    const files = await glob(this.searchPatern, {
-      cwd: this.roothPath,
-      ignore: "node_modules/**",
-    });
+    // Remove the < character we added for searching
+    const selector = this.searchedSelector.substring(1);
+    const usages = this.indexManager.findComponentUsages(selector);
 
     const filteredFiles: FoundFile[] = [];
-    for (const file of files) {
-      const filePath = path.join(this.roothPath || "", file);
-      const contentStr = await this.getFileContent(filePath);
-      if (contentStr.includes(this.searchedSelector)) {
-        const lines = contentStr.split("\n");
-        const allIndexes = Helper.findIndexAll(lines, this.searchedSelector);
-        const foundLines = allIndexes.map(index => lines[index]);
-        const foundFile: FoundFile = { path: filePath, lines: foundLines, lineNumber: allIndexes };
-        filteredFiles.push(foundFile);
-      }
+    for (const usage of usages) {
+      const filePath = path.join(this.roothPath, usage.file);
+      const content = await this.getFileContent(filePath);
+      const lines = content.split("\n");
+      const foundLines = usage.lines.map(lineNum => lines[lineNum - 1]);
+      
+      filteredFiles.push({
+        path: filePath,
+        lines: foundLines,
+        lineNumber: usage.lines
+      });
     }
-    return filteredFiles;
 
+    return filteredFiles;
   }
 
   private async getFileContent(filePath: string): Promise<string> {
     const content = await vscode.workspace.fs.readFile(
       vscode.Uri.file(filePath)
     );
-    return new Promise((resolve) => {
-      resolve(Buffer.from(content).toString("utf8"));
-    });
+    return Buffer.from(content).toString("utf8");
   }
 
   extractComponenSelector(fileContent: string): string {
