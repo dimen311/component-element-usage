@@ -21,10 +21,10 @@ export class FileFinder {
   public async init() {
     const searchedFileContent = await this.getFileContent(this.filePath);
     this.searchedSelector = this.extractComponenSelector(searchedFileContent);
-    
-    // Ensure index is built
-    await this.indexManager.buildIndex();
-    
+
+    if (!this.indexManager.isIndexBuilt) {
+      await this.indexManager.buildIndex();
+    }
     return await this.findFiles();
   }
 
@@ -43,7 +43,7 @@ export class FileFinder {
       const content = await this.getFileContent(filePath);
       const lines = content.split("\n");
       const foundLines = usage.lines.map(lineNum => lines[lineNum - 1]);
-      
+
       filteredFiles.push({
         path: filePath,
         lines: foundLines,

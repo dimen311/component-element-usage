@@ -38,6 +38,7 @@ export class ComponentIndexManager {
     private readonly storagePath: string;
     private index: ComponentIndex = {};
     private isIndexRunning: boolean = false;
+    public isIndexBuilt: boolean = false;
 
     constructor(rootPath: string, context: vscode.ExtensionContext) {
         this.rootPath = rootPath;
@@ -49,6 +50,7 @@ export class ComponentIndexManager {
             fs.mkdirSync(this.storagePath, { recursive: true });
         }
         this.loadIndex();
+        this.isIndexBuilt = Object.keys(this.index).length > 0;
     }
 
     private loadIndex(): void {
