@@ -15,7 +15,7 @@ export function activate(context: vscode.ExtensionContext) {
 
 	// Create file watcher for component files
 	const fileWatcher = vscode.workspace.createFileSystemWatcher('**/*.{ts,html}', false, false);
-	
+
 	// Debounced rebuild function
 	const debouncedRebuild = () => {
 		if (rebuildTimeout) {
@@ -51,14 +51,25 @@ export function activate(context: vscode.ExtensionContext) {
 			return;
 		}
 
-		const document = editor.document;
+		let document = editor.document;
+		let fileName = document.fileName;
 		const workspaceFolder = vscode.workspace.getWorkspaceFolder(document.uri);
 		if (!workspaceFolder) {
 			vscode.window.showInformationMessage('No workspace folder found');
 			return;
 		}
 
-		const fileFinder = new FileFinder(document.fileName, workspaceFolder.uri.fsPath, context);
+		// if document is html template, find component that uses it
+		if (document.languageId === 'html') {
+			fileName = indexManager.getComponentByTemplatePath(document.uri.fsPath);
+
+		}
+		if (!fileName) {
+			vscode.window.showInformationMessage('No component found for this template');
+			return;
+		}
+
+		const fileFinder = new FileFinder(fileName, workspaceFolder.uri.fsPath, context);
 		const usages = await fileFinder.init();
 
 		const fileTreeDataProvider = new FileTreeDataProvider();

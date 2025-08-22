@@ -10,6 +10,7 @@ interface ComponentUsage {
 
 interface ComponentInfo {
     componentFile: string;
+    templateFile?: string | null;
     usages: ComponentUsage[];
 }
 
@@ -26,6 +27,9 @@ export class ComponentIndexManager {
         'e2e/**',
         '.angular/**',
         '.vscode/**',
+        '.claude/**',
+        '.gemini/**',
+        'coverage/**',
         'public/**',
         'assets/**',
         '.git/**',
@@ -44,7 +48,7 @@ export class ComponentIndexManager {
         this.rootPath = rootPath;
         this.storagePath = context.globalStorageUri.fsPath;
         this.indexPath = path.join(this.storagePath, ComponentIndexManager.INDEX_FILE);
-        
+
         // Create storage directory if it doesn't exist
         if (!fs.existsSync(this.storagePath)) {
             fs.mkdirSync(this.storagePath, { recursive: true });
@@ -84,9 +88,12 @@ export class ComponentIndexManager {
 
                 // Extract component selector
                 const selector = this.extractComponentSelector(content);
+                const templateUrl = this.extractTemplateUrlFromComponent(content);
+                const templatePath = templateUrl ? this.normalizePath(path.join(path.dirname(file), templateUrl)) : null;
                 if (selector) {
                     this.index[selector] = {
                         componentFile: this.normalizePath(file),
+                        templateFile: templatePath,
                         usages: []
                     };
                 }
@@ -155,6 +162,13 @@ export class ComponentIndexManager {
         return match ? match[1] : null;
     }
 
+    private extractTemplateUrlFromComponent(content: string): string | null {
+        const regex = /@Component\(\s*{[^}]*?\btemplateUrl:\s*'([^']*)'/;
+        const match = content.match(regex);
+        return match ? match[1] : null;
+    }
+
+
     private updateTemplateUsages(file: string, content: string): void {
         const lines = content.split('\n');
 
@@ -162,11 +176,12 @@ export class ComponentIndexManager {
             for (const selector of Object.keys(this.index)) {
                 const lines = new Set<number>();
                 const selectorNode = this.index[selector];
-                
-                if (line.includes(`<${selector}`)) {
+
+                const tagRegex = new RegExp(`<\\s*${selector}(?=\\s|\\/|>)`, 'i');
+                if (tagRegex.test(line)) {
                     lines.add(index + 1);
                 }
-                
+
                 if (lines.size > 0) {
                     const existingUsage = selectorNode.usages.find(u => u.file === file);
                     if (existingUsage) {
@@ -181,5 +196,18 @@ export class ComponentIndexManager {
 
     public findComponentUsages(selector: string): ComponentUsage[] {
         return this.index[selector]?.usages || [];
+    }
+
+    public getComponentByTemplatePath(filePath: string) {
+        const normalizedPath = this.normalizePath(path.relative(this.rootPath, filePath));
+        for (const selector in this.index) {
+            if (this.index[selector].templateFile === normalizedPath) {
+                const componentFile = this.index[selector].componentFile;
+                // return The file system path of the associated resource. Shorthand notation for TextDocument.uri.fsPath. Independent of the uri scheme.
+                return path.join(this.rootPath, componentFile);
+
+            }
+        }
+        return '';
     }
 } 

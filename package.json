@@ -27,7 +27,7 @@
         {
           "command": "component_element_usage.findComponentUsage",
           "group": "0_navigation@3",
-          "when": "editorLangId == 'typescript'"
+          "when": "editorLangId == 'typescript' || editorLangId == 'html'"
         }
       ]
     },

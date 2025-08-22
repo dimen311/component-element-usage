@@ -26,6 +26,7 @@ yarn-error.log
 npm-debug.log
 *.tsbuildinfo
 
-**/*.js.map
 
-# Environment variables
+# Source maps and generated artifacts
+**/*.js.map
+**/*.js
