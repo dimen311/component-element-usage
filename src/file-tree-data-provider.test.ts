@@ -1,7 +1,7 @@
 
 import { FileTreeItem } from './file-tree';
 import { FileTreeDataProvider } from './file-tree-data-provider';
-import vscode from 'vscode'
+import vscode from 'vscode';
 
 describe('FileTreeDataProvider', () => {
   let provider: FileTreeDataProvider;
