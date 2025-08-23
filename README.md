@@ -42,7 +42,12 @@ Alternatively, you can manually install the extension by downloading it from the
 ## Known Issues
 
 - **Dynamic Components**: The extension may not detect component usage in dynamic or conditional templates.
-- **Large Projects**: Performance may slow down when scanning very large projects.
+
+## Changelog
+
+### 0.3.0
+- Added option to search a component from its HTML template (invoke "Find Component Usages" while an HTML template is active).
+- Added statistics footer in the Element usage explorer showing the top 3 components and their usage counts.
 
 ## Contributing
 
