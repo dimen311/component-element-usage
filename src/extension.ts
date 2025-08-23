@@ -85,11 +85,27 @@ export function activate(context: vscode.ExtensionContext) {
 
 		setTimeout(() => {
 			fileTreeDataProvider.showResults(usages);
+			
+			// Add statistics as footer
+			const statistics = indexManager.buildStatistics();
+			if (statistics) {
+				const heafterLine = `Statistics:`;
+				const summaryLine = `Total: ${statistics.componentCount} components, ${statistics.usageCount} usages`;
+				const topUsedLine = `Top 3 Components by usage:`;
+				const detailsLine = statistics.top3Used.map(([sel, info]) => `${sel} (${info.usageCount})`).join(', ');
+				
+				fileTreeDataProvider.setFooter([
+					heafterLine,
+					summaryLine,
+					topUsedLine,
+					detailsLine
+				]);
+
 			// Show the tree view in the explorer
 			vscode.commands.executeCommand('workbench.view.explorer');
 			// Move focus to the tree view
 			vscode.commands.executeCommand('elementUsageExplorer.focus');
-		}, 100);
+	}}, 100);
 	});
 
 	context.subscriptions.push(disposable);

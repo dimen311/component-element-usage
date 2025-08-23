@@ -12,6 +12,7 @@ interface ComponentInfo {
     componentFile: string;
     templateFile?: string | null;
     usages: ComponentUsage[];
+    usageCount?: number;
 }
 
 interface ComponentIndex {
@@ -94,7 +95,8 @@ export class ComponentIndexManager {
                     this.index[selector] = {
                         componentFile: this.normalizePath(file),
                         templateFile: templatePath,
-                        usages: []
+                        usages: [],
+                        usageCount: 0
                     };
                 }
             }
@@ -189,6 +191,7 @@ export class ComponentIndexManager {
                     } else {
                         selectorNode.usages.push({ file, lines: Array.from(lines) });
                     }
+                    selectorNode.usageCount = selectorNode.usages.reduce((sum, u) => sum + u.lines.length, 0);
                 }
             }
         });
@@ -209,5 +212,14 @@ export class ComponentIndexManager {
             }
         }
         return '';
+    }
+
+    public buildStatistics() {
+        const componentCount = Object.keys(this.index).length;
+        const usageCount = Object.values(this.index).reduce((sum, info) => sum + (info.usageCount || 0), 0);
+        const top3Used = Object.entries(this.index)
+            .sort((a, b) => (b[1].usageCount || 0) - (a[1].usageCount || 0))
+            .slice(0, 3);
+        return { componentCount, usageCount, top3Used};
     }
 } 

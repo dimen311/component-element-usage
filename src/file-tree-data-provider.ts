@@ -11,7 +11,14 @@ export class FileTreeDataProvider
 
   private files: FoundFile[] = [];
   private isLoading: boolean = false;
+  private footerMessages: string[] = [];
+  
   constructor() {}
+
+  setFooter(messages: string | string[]) {
+    this.footerMessages = Array.isArray(messages) ? messages : [messages];
+    this.refresh();
+  }
 
   getTreeItem(element: FileTreeItem): vscode.TreeItem {
     return element;
@@ -25,7 +32,7 @@ export class FileTreeDataProvider
     }
     // If no element is passed, return the root files
     if (!element) {
-      return this.files.map((file) => {
+      const items = this.files.map((file) => {
         const fileName = path.basename(file.path);
         if (file.lines?.length) {
           const children = [];
@@ -46,6 +53,17 @@ export class FileTreeDataProvider
           return new FileTreeItem(file.path, fileName, null, undefined);
         }
       });
+
+      // Add footer messages if they exist
+      if (this.footerMessages.length > 0) {
+        this.footerMessages.forEach(message => {
+          const footer = new FileTreeItem('', message, null, undefined);
+          footer.contextValue = 'message';
+          items.push(footer);
+        });
+      }
+
+      return items;
     } else {
       return element.children || [];
     }
